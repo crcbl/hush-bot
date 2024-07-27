@@ -36,6 +36,7 @@ func init() {
 }
 
 func main() {
+    // TODO: ensure other bots are not dependent on this one (and vice versa)
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v%v", s.State.User.Username, s.State.User.Discriminator)
 	})
