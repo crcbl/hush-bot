@@ -1,0 +1,59 @@
+# https://docs.docker.com/go/compose-spec-reference/
+# https://github.com/docker/awesome-compose
+secrets:
+  discord_token:
+    file: ./discord_token.txt
+  slack_token:
+    file: ./slack_token.txt
+  teams_token:
+    file: ./teams_token.txt
+
+services:
+  db:
+    container_name: secrets_db
+    image: postgres:16.3-alpine3.20
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=secrets
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    container_name: hush-bot
+    build:
+      context: .
+      target: final
+    image: hush-bot
+    ports:
+      - 2018:2018 
+    environment:
+      PGHOST: host.docker.internal
+      PGPORT: 5432
+      PGDBNAME: secrets
+      PGUSER: postgres
+      PGPASS: postgres
+    secrets:
+      - discord_token
+      - slack_token
+      - teams_token
+    links:
+      - db
+    volumes:
+      - './:/src'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db:
+    driver: local
+
