@@ -2,6 +2,7 @@ package discord
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -35,22 +36,22 @@ func init() {
 	})
 }
 
-func main() {
+func Entry(token string) {
     // TODO: ensure other bots are not dependent on this one (and vice versa)
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		log.Printf("Logged in as: %v%v", s.State.User.Username, s.State.User.Discriminator)
+		fmt.Printf("Logged in as: %v%v\n", s.State.User.Username, s.State.User.Discriminator)
 	})
 	err := s.Open()
 	if err != nil {
-		log.Fatalf("Cannot open the session: %v", err)
+        panic(fmt.Sprintf("Cannot open the session: %v", err))
 	}
 
 	log.Println("Adding commands...")
-	registeredCommands := make([]*discordgo.ApplicationCommand, len(Commands))
-	for i, v := range Commands {
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
+	for i, v := range commands {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, *GuildID, v)
 		if err != nil {
-			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+			panic(fmt.Sprintf("Cannot create '%v' command: %v", v.Name, err))
 		}
 		registeredCommands[i] = cmd
 	}
@@ -59,7 +60,7 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
-	log.Println("Press Ctrl+C to exit")
+    fmt.Println("Press Ctrl+C to exit")
 	<-stop
 
 	if *RemoveCommands {
@@ -68,7 +69,7 @@ func main() {
 		for _, v := range registeredCommands {
 			err := s.ApplicationCommandDelete(s.State.User.ID, *GuildID, v.ID)
 			if err != nil {
-				log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
+				panic(fmt.Sprintf("Cannot delete '%v' command: %v", v.Name, err))
 			}
 		}
 	}

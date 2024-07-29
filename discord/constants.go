@@ -1,19 +1,19 @@
 package discord
 
 import (
-    "github.com/bwmarrin/discordgo"
+	"github.com/bwmarrin/discordgo"
 )
 
 var (
-	IntegerOptionMinValue          = 1.0
-	DmPermission                   = true
-	DefaultMemberPermissions int64 = discordgo.PermissionManageMessages
-    Commands = []*discordgo.ApplicationCommand{
+	integerOptionMinValue          = 1.0
+	dmPermission                   = true
+	defaultMemberPermissions int64 = discordgo.PermissionManageMessages
+	commands                       = []*discordgo.ApplicationCommand{
 		{
-			Name:                     "permission-overview",
+			Name:                     "test",
 			Description:              "Test command for demonstration of default command permissions",
-			DefaultMemberPermissions: &DefaultMemberPermissions,
-			DMPermission:             &DmPermission,
+			DefaultMemberPermissions: &defaultMemberPermissions,
+			DMPermission:             &dmPermission,
 		},
 		{
 			Name:        "secret",
@@ -28,11 +28,11 @@ var (
 			},
 		},
 		{
-			Name:        "shared",
+			Name:        "permissions",
 			Description: "Command to display names of secrets which have been shared with you, and number of times you may request to view said secret.",
 		},
 		{
-			Name:        "share-secret",
+			Name:        "share",
 			Description: "Command to share a secret with a specified user, for a given number of uses and lifetime",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
@@ -70,7 +70,7 @@ var (
 							Type:        discordgo.ApplicationCommandOptionInteger,
 							Name:        "hours",
 							Description: "Number of hours you would like the secret permissions to expire after",
-							MinValue:    &IntegerOptionMinValue,
+							MinValue:    &integerOptionMinValue,
 						},
 					},
 				},
@@ -78,9 +78,9 @@ var (
 		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"permissions-overview": Permissions,
-		"secret":               Secret,
-		"shared":               Shared,
-		"share-secret":         ShareSecret,
+		"test":        test,
+		"secret":      secret,
+		"permissions": permissions,
+		"share":       share,
 	}
 )
